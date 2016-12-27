@@ -25,7 +25,7 @@ public:
 
     GraphEdgeConnection(char v1, char v2);
 
-    bool contatinVertex(char v);
+    bool containVertex(char v);
 };
 
 
@@ -40,6 +40,7 @@ private:
     bool isVisited(char v);
 
     void visitVertex(char v);
+    void resetVisited();
 public:
     void addEdge(char v1, char v2);
 
