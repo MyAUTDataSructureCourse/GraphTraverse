@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <stack>
+#include <queue>
 #include "Graph.h"
 
 GraphEdgeConnection::GraphEdgeConnection(char v1, char v2)
@@ -12,7 +13,7 @@ GraphEdgeConnection::GraphEdgeConnection(char v1, char v2)
     vertex2.key = v2;
 }
 
-bool GraphEdgeConnection::contatinVertex(char v)
+bool GraphEdgeConnection::containVertex(char v)
 {
     return (v == vertex1.key) || (v == vertex2.key);
 }
@@ -45,7 +46,7 @@ std::vector<char> Graph::getAllNotVisitedVertexesConnectedTo(char v)
 {
     std::vector<char> result;
     for (int i = 0; i < edgeTable.size(); ++i) {
-        if(edgeTable[i].contatinVertex(v))
+        if(edgeTable[i].containVertex(v))
         {
             char c = (edgeTable[i].vertex1.key == v)? edgeTable[i].vertex2.key : edgeTable[i].vertex1.key;
             if(!isVisited(c))
@@ -96,11 +97,12 @@ std::vector<char> Graph::dfs(char startVertex)
     std::stack<char> stck;
     stck.push(currentVertex);
     result.push_back(currentVertex);
+    visitVertex(currentVertex);
 
     while (! stck.empty())
     {
         currentVertex = stck.top();
-        visitVertex(currentVertex);
+
         std::vector<char> nearestVertexes = getAllNotVisitedVertexesConnectedTo(currentVertex);
         if(nearestVertexes.size() == 0)
         {
@@ -111,9 +113,11 @@ std::vector<char> Graph::dfs(char startVertex)
             currentVertex = nearestVertexes[0];
             stck.push(currentVertex);
             result.push_back(currentVertex);
+            visitVertex(currentVertex);
         }
     }
 
+    resetVisited();
 
     return result;
 }
@@ -122,8 +126,35 @@ std::vector<char> Graph::bfs(char startVertex)
 {
     std::vector<char> result;
 
+    char currentVertex = startVertex;
+    std::queue<char> q;
 
+    q.push(currentVertex);
+    visitVertex(currentVertex);
+    result.push_back(currentVertex);
+
+
+    while (! q.empty())
+    {
+
+        currentVertex = q.front();
+        q.pop();
+        std::vector<char> nearestVertexes = getAllNotVisitedVertexesConnectedTo(currentVertex);
+        for (int i = 0; i < nearestVertexes.size(); ++i) {
+            result.push_back(nearestVertexes[i]);
+            visitVertex(nearestVertexes[i]);
+            q.push(nearestVertexes[i]);
+        }
+    }
+
+    resetVisited();
 
     return result;
 }
 
+void Graph::resetVisited()
+{
+    for (int i = 0; i < vertexes.size(); ++i) {
+        vertexes[i].isVisited = false;
+    }
+}
